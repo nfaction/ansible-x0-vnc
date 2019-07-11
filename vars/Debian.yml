@@ -1,0 +1,13 @@
+---
+
+# https://www.techrepublic.com/article/how-to-install-a-gui-on-top-of-centos-7/
+# https://access.redhat.com/discussions/1149233
+gui_prereqs:
+  - task-gnome-desktop
+
+vnc_packages:
+  - xvnc4viewer
+  - vnc4server
+  - x11vnc
+
+gdm_config: "/etc/gdm3/daemon.conf"

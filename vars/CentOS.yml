@@ -1,0 +1,14 @@
+---
+
+# https://www.techrepublic.com/article/how-to-install-a-gui-on-top-of-centos-7/
+# https://access.redhat.com/discussions/1149233
+gui_prereqs:
+  - "@GNOME Desktop"
+  - "@Graphical Administration Tools"
+
+vnc_packages:
+  - tigervnc
+  - tigervnc-server
+  - x11vnc
+
+gdm_config: "/etc/gdm/custom.conf"

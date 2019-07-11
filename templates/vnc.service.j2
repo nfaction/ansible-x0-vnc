@@ -1,0 +1,11 @@
+[Unit]
+Description=Remote desktop service (VNC)
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User={{ USER_ACCOUNT.OWNER }}
+ExecStart=/bin/bash -c 'x11vnc -forever -rfbauth {{ USER_ACCOUNT.HOME_DIR }}/.vnc/passwd &'
+
+[Install]
+WantedBy=multi-user.target
