@@ -2,6 +2,11 @@
 - name: Converge
   hosts: all
   vars: []
-  # os_vars_dir: ../../../../group_vars/operating-systems
+  pre_tasks:
+    - name: add main user to vboxusers group
+      user:
+        name: "vnc"
+        shell: /bin/bash
+
   roles:
     - role: ansible-x0-vnc

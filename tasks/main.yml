@@ -3,17 +3,16 @@
 - name: gather os specific variables
   include_vars: '{{ item }}'
   with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
 
-# - name: install pre-reqs
-#   package:
-#     name: "{{ item }}"
-#     state: present
-#   with_items: "{{ gui_prereqs }}"
-#   when:
-#     - ansible_os_family == "RedHat"
+- name: install pre-reqs
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ gui_prereqs }}"
+  become: true
 
 - name: install vnc
   package:
@@ -24,52 +23,52 @@
 
 - name: create autostart dir
   file:
-    path: '{{ USER_ACCOUNT.HOME_DIR }}/.config/autostart'
+    path: '{{ user_account_home }}/.config/autostart'
     state: directory
-    owner: '{{ USER_ACCOUNT.OWNER }}'
-    group: '{{ USER_ACCOUNT.GROUP }}'
+    owner: '{{ user_account_owner }}'
+    group: '{{ user_account_group }}'
 
 - name: create autostart file
   copy:
-    content: "[Desktop Entry]\nEncoding=UTF-8\nType=Application\nName=X11VNC\nExec=x0vncserver -PasswordFile {{ USER_ACCOUNT.HOME_DIR }}/.vnc/passwd -display :{{ VNC_DISPLAY | default(0) }}\nStartupNotify=false\nTerminal=false\nHidden=false"
-    dest: '{{ USER_ACCOUNT.HOME_DIR }}/.config/autostart/tigervnc.desktop'
-    owner: '{{ USER_ACCOUNT.OWNER }}'
-    group: '{{ USER_ACCOUNT.GROUP }}'
+    content: "[Desktop Entry]\nEncoding=UTF-8\nType=Application\nName=X11VNC\nExec=x0vncserver -PasswordFile {{ user_account_home }}/.vnc/passwd -display :{{ vnc_display | default(0) }}\nStartupNotify=false\nTerminal=false\nHidden=false"
+    dest: '{{ user_account_home }}/.config/autostart/tigervnc.desktop'
+    owner: '{{ user_account_owner }}'
+    group: '{{ user_account_group }}'
   when: ansible_service_mgr != "systemd"
 
 - name: create .vnc dir
   file:
-    path: '{{ USER_ACCOUNT.HOME_DIR }}/.vnc'
+    path: '{{ user_account_home }}/.vnc'
     state: directory
-    owner: '{{ USER_ACCOUNT.OWNER }}'
-    group: '{{ USER_ACCOUNT.GROUP }}'
+    owner: '{{ user_account_owner }}'
+    group: '{{ user_account_group }}'
   tags:
     - vncpasswd
 
 - name: set vnc password
-  shell: "/usr/bin/printf '%s\n%s\n' '{{ VNC.PASSWORD }}' '{{ VNC.PASSWORD }}' | vncpasswd {{ USER_ACCOUNT.HOME_DIR }}/.vnc/passwd"
+  shell: "/usr/bin/printf '%s\n%s\n' '{{ vnc_password }}' '{{ vnc_password }}' | vncpasswd {{ user_account_home }}/.vnc/passwd"
   args:
-    chdir: '{{ USER_ACCOUNT.HOME_DIR }}'
-    creates: '{{ USER_ACCOUNT.HOME_DIR }}/.vnc/passwd'
+    chdir: '{{ user_account_home }}'
+    creates: '{{ user_account_home }}/.vnc/passwd'
   no_log: true
   tags:
     - vncpasswd
 
 - name: chown vnc passwd file
   file:
-    path: '{{ USER_ACCOUNT.HOME_DIR }}/.vnc/passwd'
-    owner: '{{ USER_ACCOUNT.OWNER }}'
-    group: '{{ USER_ACCOUNT.GROUP }}'
+    path: '{{ user_account_home }}/.vnc/passwd'
+    owner: '{{ user_account_owner }}'
+    group: '{{ user_account_group }}'
     mode: 0600
   tags:
     - vncpasswd
 
 - name: start vnc
-  shell: "x11vnc -forever -rfbauth {{ USER_ACCOUNT.HOME_DIR }}/.vnc/passwd &"
+  shell: "x11vnc -forever -rfbauth {{ user_account_home }}/.vnc/passwd &"
   args:
-    chdir: '{{ USER_ACCOUNT.HOME_DIR }}'
+    chdir: '{{ user_account_home }}'
   become: true
-  become_user: '{{ USER_ACCOUNT.OWNER }}'
+  become_user: '{{ user_account_owner }}'
   ignore_errors: true
   when: ansible_service_mgr != "systemd"
   tags:
@@ -85,14 +84,17 @@
   when: ansible_service_mgr == "systemd"
 
 - name: reload systemd scripts
-  shell: systemctl daemon-reload
-  when: ansible_service_mgr == "systemd"
+  systemd:
+    daemon_reload: true
+  when:
+    - ansible_service_mgr == "systemd"
 
 - name: start TigerVNC service
   service:
     name: vnc.service
     state: restarted
     enabled: true
+  changed_when: false
   when: ansible_service_mgr == "systemd"
 
 # https://help.gnome.org/admin/system-admin-guide/stable/login-automatic.html.en
@@ -106,4 +108,11 @@
     backup: true
   with_items:
     - { option: AutomaticLoginEnable, value: true }
-    - { option: AutomaticLogin, value: '{{ USER_ACCOUNT.OWNER }}' }
+    - { option: AutomaticLogin, value: '{{ user_account_owner }}' }
+    - { option: WaylandEnable, value: false }
+
+- name: restart gdm
+  service:
+    name: gdm
+    state: restarted
+  changed_when: false

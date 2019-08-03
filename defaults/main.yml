@@ -1,2 +1,14 @@
 ---
-# defaults file for ansible-x0-vnc
+
+# Workarounds for running the playbook in this role
+ansible_root_dir: "{{ playbook_dir }}"
+ansible_root_dir_roles_path: "{{ ansible_root_dir }}/roles"
+
+user_account_owner: "vnc"
+user_account_group: "{{ user_account_owner }}"
+user_account_home: "/home/{{ user_account_owner }}"
+
+vnc_display: 0
+
+vnc_password_file: "vnc-password"
+vnc_password: "{{ lookup('password', ansible_root_dir + '/' + vnc_password_file + ' chars=ascii_letters length=20') }}"

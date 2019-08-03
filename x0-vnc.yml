@@ -1,0 +1,19 @@
+---
+#
+# Usage:
+#
+#   ansible-playbook ansible-x0-vnc/x0-vnc.yml -i <vnc-hosts-file> -vvv
+#
+- name: configure X0 VNC Server
+  hosts: all
+  vars: []
+  pre_tasks:
+    - name: set playbook dir when running this playbook here
+      set_fact:
+        ansible_root_dir: "{{ playbook_dir | regex_replace('/roles/ansible-x0-vnc', '') }}"
+      when: "'/roles/ansible-x0-vnc' in playbook_dir"
+      tags:
+        - vnc
+
+  roles:
+    - role: ansible-x0-vnc
