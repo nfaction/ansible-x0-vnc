@@ -1,0 +1,28 @@
+---
+
+- name: start vnc
+  shell: "x11vnc -forever -rfbauth {{ user_account_home }}/.vnc/passwd &"
+  args:
+    chdir: '{{ user_account_home }}'
+  become: true
+  become_user: '{{ user_account_owner }}'
+  ignore_errors: true
+  when: ansible_service_mgr != "systemd"
+  listen: "start/restart vnc service"
+  tags:
+    - vncpasswd
+
+- name: start TigerVNC service
+  service:
+    name: vnc.service
+    state: restarted
+    enabled: true
+  changed_when: false
+  when: ansible_service_mgr == "systemd"
+  listen: "start/restart vnc service"
+
+- name: restart display manager
+  service:
+    name: "{{ system_display_manager }}"
+    state: restarted
+  changed_when: false

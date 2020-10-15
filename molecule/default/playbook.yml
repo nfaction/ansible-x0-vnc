@@ -1,12 +1,13 @@
 ---
 - name: Converge
   hosts: all
-  vars: []
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   pre_tasks:
-    - name: add main user to vboxusers group
+    - name: "add main user to vnc group"
       user:
         name: "vnc"
         shell: /bin/bash
-
+        state: present
   roles:
     - role: ansible-x0-vnc
