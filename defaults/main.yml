@@ -8,6 +8,22 @@ user_account_owner: "vnc"
 user_account_group: "{{ user_account_owner }}"
 user_account_home: "/home/{{ user_account_owner }}"
 
+# https://www.techrepublic.com/article/how-to-install-a-gui-on-top-of-centos-7/
+# https://access.redhat.com/discussions/1149233
+rhel_desktop_packages:
+  - "@GNOME Desktop"
+  - "@Graphical Administration Tools"
+
+# https://www.techrepublic.com/article/how-to-install-a-gui-on-top-of-centos-7/
+# https://access.redhat.com/discussions/1149233
+debian_desktop_packages:
+  - task-gnome-desktop
+
+install_gui_prereqs: true
+gui_prereqs: []
+
+system_display_manager: gdm
+
 vnc_display: 0
 
 vnc_password_file: "vnc-password"

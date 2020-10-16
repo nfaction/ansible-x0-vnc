@@ -1,5 +1,4 @@
 ---
-
 - name: gather os specific variables
   include_vars: '{{ item }}'
   with_first_found:
@@ -13,6 +12,7 @@
     state: present
   with_items: "{{ gui_prereqs }}"
   become: true
+  when: install_gui_prereqs | bool
 
 - name: install vnc
   package:
@@ -42,15 +42,17 @@
     state: directory
     owner: '{{ user_account_owner }}'
     group: '{{ user_account_group }}'
+  notify: "start/restart vnc service"
   tags:
     - vncpasswd
 
 - name: set vnc password
-  shell: "/usr/bin/printf '%s\n%s\n' '{{ vnc_password }}' '{{ vnc_password }}' | vncpasswd {{ user_account_home }}/.vnc/passwd"
+  shell: "/usr/bin/printf '%s\n%s\nn\n' '{{ vnc_password }}' '{{ vnc_password }}' | vncpasswd {{ user_account_home }}/.vnc/passwd"
   args:
     chdir: '{{ user_account_home }}'
     creates: '{{ user_account_home }}/.vnc/passwd'
   no_log: true
+  notify: "start/restart vnc service"
   tags:
     - vncpasswd
 
@@ -60,17 +62,7 @@
     owner: '{{ user_account_owner }}'
     group: '{{ user_account_group }}'
     mode: 0600
-  tags:
-    - vncpasswd
-
-- name: start vnc
-  shell: "x11vnc -forever -rfbauth {{ user_account_home }}/.vnc/passwd &"
-  args:
-    chdir: '{{ user_account_home }}'
-  become: true
-  become_user: '{{ user_account_owner }}'
-  ignore_errors: true
-  when: ansible_service_mgr != "systemd"
+  notify: "start/restart vnc service"
   tags:
     - vncpasswd
 
@@ -81,21 +73,16 @@
     owner: root
     group: root
     mode: 0644
+  notify: "start/restart vnc service"
   when: ansible_service_mgr == "systemd"
 
 - name: reload systemd scripts
   systemd:
     daemon_reload: true
+  notify: "start/restart vnc service"
   when:
     - ansible_service_mgr == "systemd"
 
-- name: start TigerVNC service
-  service:
-    name: vnc.service
-    state: restarted
-    enabled: true
-  changed_when: false
-  when: ansible_service_mgr == "systemd"
 
 # https://help.gnome.org/admin/system-admin-guide/stable/login-automatic.html.en
 - name: set up autologin for main user
@@ -106,13 +93,15 @@
     value: "{{ item.value }}"
     no_extra_spaces: true
     backup: true
+  notify: "restart display manager"
   with_items:
-    - { option: AutomaticLoginEnable, value: true }
-    - { option: AutomaticLogin, value: '{{ user_account_owner }}' }
-    - { option: WaylandEnable, value: false }
-
-- name: restart gdm
-  service:
-    name: gdm
-    state: restarted
-  changed_when: false
+    - name: autologin enable
+      option: AutomaticLoginEnable
+      value: true
+    - name: autologin
+      option: AutomaticLogin
+      value: '{{ user_account_owner }}'
+    - name: disable Wayland
+      option: WaylandEnable
+      value: false
+  when: system_display_manager == "gdm"
