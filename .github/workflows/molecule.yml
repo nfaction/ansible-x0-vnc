@@ -34,10 +34,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        distro:
-          - debian10
-          - debian11
-          - centos7
+        include:
+          - node-version: deb10
+            distro: debian10
+            tag: latest
+          - node-version: deb11
+            distro: debian11
+            tag: latest
+          - node-version: cent7
+            distro: centos7
+            tag: python3
           # - ubuntu2004
 
     steps:
@@ -58,3 +64,4 @@ jobs:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+          MOLECULE_TAG: ${{ matrix.tag }}
