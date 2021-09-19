@@ -1,5 +1,7 @@
 ---
 galaxy_info:
+  role_name: x0_vnc
+  namespace: ansible
   author: Matthew DePorter
   description: Role to configure X0 VNC Server
   company: Mobile-Tech LLC
