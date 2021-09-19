@@ -37,7 +37,7 @@ jobs:
         distro:
           - debian10
           - debian11
-          # - centos7
+          - centos7
           # - ubuntu2004
 
     steps:
