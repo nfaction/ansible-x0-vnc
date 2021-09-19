@@ -13,6 +13,13 @@
   when:
     - ansible_os_family == 'Debian'
 
+- name: install GUI for CentOS
+  shell: yum install @GNOME Desktop -y
+  changed_when: false
+  when:
+    - ansible_os_family == 'RedHat'
+    - install_gui_prereqs | bool
+
 - name: install pre-reqs
   package:
     name: "{{ item }}"
@@ -58,7 +65,7 @@
   args:
     chdir: '{{ user_account_home }}'
     creates: '{{ user_account_home }}/.vnc/passwd'
-  no_log: true
+#  no_log: true
   notify: "start/restart vnc service"
   tags:
     - vncpasswd

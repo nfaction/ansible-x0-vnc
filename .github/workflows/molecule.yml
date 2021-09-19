@@ -44,7 +44,9 @@ jobs:
           - node-version: cent7
             distro: centos7
             tag: python3
-          # - ubuntu2004
+          - node-version: ubunt20.04
+            distro: ubuntu2004
+            tag: latest
 
     steps:
       - name: Check out the codebase.

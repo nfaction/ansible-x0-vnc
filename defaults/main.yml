@@ -11,13 +11,17 @@ user_account_home: "/home/{{ user_account_owner }}"
 # https://www.techrepublic.com/article/how-to-install-a-gui-on-top-of-centos-7/
 # https://access.redhat.com/discussions/1149233
 rhel_desktop_packages:
-  - "@GNOME Desktop"
+  - epel-release
   - "@Graphical Administration Tools"
 
 # https://www.techrepublic.com/article/how-to-install-a-gui-on-top-of-centos-7/
 # https://access.redhat.com/discussions/1149233
 debian_desktop_packages:
   - task-gnome-desktop
+
+# https://www.configserverfirewall.com/ubuntu-linux/install-desktop-on-ubuntu-server/
+ubuntu_desktop_packages:
+  - gnome-core
 
 install_gui_prereqs: true
 gui_prereqs: []

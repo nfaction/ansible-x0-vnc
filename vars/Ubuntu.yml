@@ -1,0 +1,10 @@
+---
+
+gui_prereqs: "{{ ubuntu_desktop_packages }}"
+
+vnc_packages:
+  - tigervnc-standalone-server
+  - tigervnc-common
+  - x11vnc
+
+gdm_config: "/etc/gdm3/daemon.conf"
