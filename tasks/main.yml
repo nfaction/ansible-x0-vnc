@@ -65,7 +65,7 @@
   args:
     chdir: '{{ user_account_home }}'
     creates: '{{ user_account_home }}/.vnc/passwd'
-#  no_log: true
+  no_log: true
   notify: "start/restart vnc service"
   tags:
     - vncpasswd
