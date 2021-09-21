@@ -1,6 +1,6 @@
 ---
 
-gui_prereqs: "{{ debian_desktop_packages }}"
+gui_prereqs: "{{ ubuntu_desktop_packages }}"
 
 vnc_packages:
   - tigervnc-standalone-server

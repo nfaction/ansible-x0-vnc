@@ -1,6 +1,6 @@
 # ansible-x0-vnc
 
-[![Build Status](https://travis-ci.org/nfaction/ansible-x0-vnc.svg?branch=master)](https://travis-ci.org/nfaction/ansible-x0-vnc)
+[![Ansible Molecule Test Matrix](https://github.com/nfaction/ansible-x0-vnc/actions/workflows/molecule.yml/badge.svg)](https://github.com/nfaction/ansible-x0-vnc/actions/workflows/molecule.yml)
 
 Role to install and configure X0 VNC Server
 
